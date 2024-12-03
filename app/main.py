@@ -4,7 +4,7 @@ from fastapi import FastAPI, Query
 
 from contextlib import asynccontextmanager
 
-from app.utils import parser, middleware, logger
+from app.utils import parser, middleware
 from app.routes import example
 from app.clients import mongo
 
