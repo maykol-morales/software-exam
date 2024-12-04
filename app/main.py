@@ -15,8 +15,6 @@ async def lifespan(_: FastAPI):
 
     yield
     mongo.disconnect()
-
-
 app = FastAPI(
     title="Example",
     lifespan=lifespan
@@ -63,4 +61,4 @@ async def monitor(
     return report
 
 
-app.include_router(example.router, prefix="/example")
+app.include_router(example.router, prefix="/tickets")
