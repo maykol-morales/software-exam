@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.post("/new")
-def read_root(event: Event):
+def new_event(event: Event):
     if event.ticket_price <= 0:
         return HTTPException(status_code=400, detail="Event ticket price must be greater than 0")
 
