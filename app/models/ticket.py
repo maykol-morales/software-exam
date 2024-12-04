@@ -1,18 +1,33 @@
 from typing import Optional
-
 from pydantic import BaseModel
-from enum import Enum
 
-class TicketState(Enum):
-    AVAILABLE = 'available'
-    SOLD = 'sold'
-    RESERVED = 'reserved'
-    CANCELED = 'canceled'
-    USED = 'used'
 
 class Ticket(BaseModel):
-    id: str
+    ticket_id: str
+    event_id: str
+    name: str
+    expires_at: str
+
     user_id: Optional[str] = None
     price: float
-    expires_at: int
-    state: TicketState
+    state: str = "available"
+
+
+class TicketPurchase(BaseModel):
+    event_id: str
+    user_id: str
+    user_wallet: int
+
+
+class TicketReserve(BaseModel):
+    event_id: str
+    user_id: str
+
+
+class TicketCancel(BaseModel):
+    ticket_id: str
+    user_id: str
+
+
+class TicketUse(BaseModel):
+    ticket_id: str
