@@ -4,6 +4,7 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.clients.mongo import insert_track
+from app.utils.logger import info, error
 
 
 class Metrics(BaseHTTPMiddleware):
@@ -22,10 +23,13 @@ class Metrics(BaseHTTPMiddleware):
 
         if 200 <= status_code < 300:
             Metrics.counts["2XX"] += 1
+            info("success on execute: " + request.url.path)
         elif 400 <= status_code < 500:
             Metrics.counts["4XX"] += 1
+            error("error on execute: " + request.url.path)
         elif 500 <= status_code < 600:
             Metrics.counts["5XX"] += 1
+            error("error on execute: " + request.url.path)
 
         return response
 
