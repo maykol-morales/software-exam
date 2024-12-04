@@ -1,13 +1,5 @@
-from enum import Enum
 from typing import Optional
 from pydantic import BaseModel
-
-
-class TicketState(Enum):
-    AVAILABLE = 'available'
-    RESERVED = 'reserved'
-    SOLD = 'sold'
-    USED = 'used'
 
 
 class Ticket(BaseModel):
@@ -18,7 +10,7 @@ class Ticket(BaseModel):
 
     user_id: Optional[str] = None
     price: float
-    state: str = TicketState.AVAILABLE.value
+    state: str = "available"
 
 
 class TicketPurchase(BaseModel):

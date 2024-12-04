@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.models.event import Event
 from app.clients.mongo import new_event, new_ticket
-from app.models.ticket import Ticket, TicketState
+from app.models.ticket import Ticket
 
 router = APIRouter()
 
@@ -27,7 +27,7 @@ def read_root(event: Event):
                 expires_at=event.expires_at,
 
                 price=event.ticket_price,
-                state=TicketState.AVAILABLE.value
+                state="available"
             )
         )
 

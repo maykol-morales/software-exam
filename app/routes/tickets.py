@@ -77,7 +77,7 @@ def cancel_ticket(cancel: TicketCancel):
     }
 
 
-@router.get("/use")
+@router.post("/use")
 def use_ticket(use: TicketUse):
     ticket = find_ticket(use.ticket_id)
 
