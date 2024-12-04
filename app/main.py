@@ -5,7 +5,7 @@ from fastapi import FastAPI, Query
 from contextlib import asynccontextmanager
 
 from app.utils import parser, middleware
-from app.routes import example
+from app.routes import tickets, events
 from app.clients import mongo
 
 
@@ -15,6 +15,8 @@ async def lifespan(_: FastAPI):
 
     yield
     mongo.disconnect()
+
+
 app = FastAPI(
     title="Example",
     lifespan=lifespan
@@ -44,9 +46,9 @@ async def get_metrics():
 
 @app.get("/monitor")
 async def monitor(
-    method: Optional[str] = Query(None, example="GET"),
-    status_code: Optional[int] = Query(None, example=200),
-    limit: int = Query(10, example=10),
+        method: Optional[str] = Query(None, example="GET"),
+        status_code: Optional[int] = Query(None, example=200),
+        limit: int = Query(10, example=10),
 ):
     query = {}
 
@@ -61,4 +63,5 @@ async def monitor(
     return report
 
 
-app.include_router(example.router, prefix="/tickets")
+app.include_router(events.router, prefix="/events")
+app.include_router(tickets.router, prefix="/tickets")

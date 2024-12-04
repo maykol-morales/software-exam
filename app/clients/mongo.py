@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
 from app.models.event import Event
+from app.models.ticket import Ticket
 
 from app.utils.logger import error, info
 
@@ -58,5 +59,33 @@ def get_tracks(query: dict, limit: int = 10):
 def new_event(event: Event):
     try:
         connection.db["events"].insert_one(event.model_dump())
+    except PyMongoError:
+        raise
+
+
+def new_ticket(ticket: Ticket):
+    try:
+        connection.db["tickets"].insert_one(ticket.model_dump())
+    except PyMongoError:
+        raise
+
+
+def find_event(event_id: str):
+    try:
+        return connection.db["events"].find_one({"event_id": event_id})
+    except PyMongoError:
+        return None
+
+
+def find_available_ticket(event_id: str):
+    try:
+        return connection.db["tickets"].find_one({"event_id": event_id, "state": "available"})
+    except PyMongoError:
+        return None
+
+
+def save_ticket(ticket):
+    try:
+        connection.db["tickets"].update_one({"ticket_id": ticket.ticket_id}, {"$set": ticket.model_dump()})
     except PyMongoError:
         raise
