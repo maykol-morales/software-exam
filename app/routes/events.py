@@ -22,6 +22,7 @@ def read_root(event: Event):
         new_ticket(
             Ticket(
                 ticket_id=str(uuid4()),
+                event_id=event.event_id,
                 name=event.name,
                 expires_at=event.expires_at,
 

@@ -77,6 +77,13 @@ def find_event(event_id: str):
         return None
 
 
+def find_ticket(ticket_id: str):
+    try:
+        return connection.db["tickets"].find_one({"ticket_id": ticket_id})
+    except PyMongoError:
+        return None
+
+
 def find_available_ticket(event_id: str):
     try:
         return connection.db["tickets"].find_one({"event_id": event_id, "state": "available"})
@@ -84,8 +91,8 @@ def find_available_ticket(event_id: str):
         return None
 
 
-def save_ticket(ticket):
+def save_ticket(ticket: dict):
     try:
-        connection.db["tickets"].update_one({"ticket_id": ticket.ticket_id}, {"$set": ticket.model_dump()})
+        connection.db["tickets"].update_one({"ticket_id": ticket['ticket_id']}, {"$set": ticket})
     except PyMongoError:
         raise

@@ -1,49 +1,96 @@
 from fastapi import APIRouter, HTTPException
 
-from app.models.ticket import TicketLogic
-from app.clients.mongo import find_event, find_available_ticket, save_ticket
+from app.models.ticket import *
+from app.clients.mongo import *
 
 router = APIRouter()
 
 
 @router.post("/purchase")
-def purchase_ticket(logic: TicketLogic):
-    event = find_event(logic.event_id)
+def purchase_ticket(purchase: TicketPurchase):
+    event = find_event(purchase.event_id)
 
     if not event:
         return HTTPException(status_code=404, detail="Event not found.")
 
-    ticket = find_available_ticket(logic.event_id)
+    ticket = find_available_ticket(purchase.event_id)
 
     if not ticket:
         return HTTPException(status_code=404, detail="No tickets available for this event.")
 
-    if ticket.price > logic.user_wallet:
+    if ticket["price"] > purchase.user_wallet:
         return HTTPException(status_code=400, detail="Insufficient funds.")
 
-    ticket.user_id = logic.user_id
-    ticket.state = "sold"
+    ticket["user_id"] = purchase.user_id
+    ticket["state"] = "sold"
 
     save_ticket(ticket)
 
     return {
-        "detail": "Ticket purchased successfully."
+        "detail": "Ticket purchased successfully.",
+        "user_wallet": purchase.user_wallet - ticket["price"]
     }
 
 
 @router.post("/reserve")
-def reserve_ticket():
-    response = {
-        "message": "Ticket reserved successfully."
-    }
+def reserve_ticket(reserver: TicketReserve):
+    event = find_event(reserver.event_id)
 
-    return response
+    if not event:
+        return HTTPException(status_code=404, detail="Event not found.")
+
+    ticket = find_available_ticket(reserver.event_id)
+
+    if not ticket:
+        return HTTPException(status_code=404, detail="No tickets available for this event.")
+
+    ticket["user_id"] = reserver.user_id
+    ticket["state"] = "reserved"
+
+    save_ticket(ticket)
+
+    return {
+        "detail": "Ticket reserved successfully."
+    }
 
 
 @router.post("/cancel")
-def cancel_ticket():
-    response = {
-        "message": "Ticket canceled successfully."
+def cancel_ticket(cancel: TicketCancel):
+    ticket = find_ticket(cancel.ticket_id)
+
+    if not ticket:
+        return HTTPException(status_code=404, detail="Ticket not found.")
+
+    if ticket["user_id"] != cancel.user_id:
+        return HTTPException(status_code=400, detail="Ticket does not belong to this user.")
+
+    if ticket["state"] != "reserved":
+        return HTTPException(status_code=400, detail="Ticket is not reserved.")
+
+    ticket["user_id"] = None
+    ticket["state"] = "available"
+
+    save_ticket(ticket)
+
+    return {
+        "detail": "Ticket canceled successfully."
     }
 
-    return response
+
+@router.get("/use")
+def use_ticket(use: TicketUse):
+    ticket = find_ticket(use.ticket_id)
+
+    if not ticket:
+        return HTTPException(status_code=404, detail="Ticket not found.")
+
+    if ticket["state"] != "sold":
+        return HTTPException(status_code=400, detail="Ticket is not sold.")
+
+    ticket["state"] = "used"
+
+    save_ticket(ticket)
+
+    return {
+        "detail": "Ticket used successfully."
+    }

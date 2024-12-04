@@ -21,7 +21,21 @@ class Ticket(BaseModel):
     state: str = TicketState.AVAILABLE.value
 
 
-class TicketLogic(BaseModel):
+class TicketPurchase(BaseModel):
     event_id: str
     user_id: str
     user_wallet: int
+
+
+class TicketReserve(BaseModel):
+    event_id: str
+    user_id: str
+
+
+class TicketCancel(BaseModel):
+    ticket_id: str
+    user_id: str
+
+
+class TicketUse(BaseModel):
+    ticket_id: str
