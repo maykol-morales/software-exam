@@ -45,29 +45,32 @@ def insert_track(route: str, method: str, status_code: int, start_date, end_date
             "end_date": end_date,
             "latency": end_date - start_date
         })
+        return True
     except PyMongoError:
-        raise
+        return False
 
 
 def get_tracks(query: dict, limit: int = 10):
     try:
         return connection.db["tracks"].find(query).sort("start_date", -1).limit(limit).to_list(length=limit)
     except PyMongoError:
-        raise
+        return None
 
 
 def new_event(event: Event):
     try:
         connection.db["events"].insert_one(event.model_dump())
+        return True
     except PyMongoError:
-        raise
+        return False
 
 
 def new_ticket(ticket: Ticket):
     try:
         connection.db["tickets"].insert_one(ticket.model_dump())
+        return True
     except PyMongoError:
-        raise
+        return False
 
 
 def find_event(event_id: str):
@@ -94,5 +97,6 @@ def find_available_ticket(event_id: str):
 def save_ticket(ticket: dict):
     try:
         connection.db["tickets"].update_one({"ticket_id": ticket['ticket_id']}, {"$set": ticket})
+        return True
     except PyMongoError:
-        raise
+        return False
