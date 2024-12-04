@@ -3,6 +3,8 @@ from os import getenv
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
+from app.models.event import Event
+
 from app.utils.logger import error, info
 
 MONGO_URI = getenv("MONGO_URI")
@@ -49,5 +51,12 @@ def insert_track(route: str, method: str, status_code: int, start_date, end_date
 def get_tracks(query: dict, limit: int = 10):
     try:
         return connection.db["tracks"].find(query).sort("start_date", -1).limit(limit).to_list(length=limit)
+    except PyMongoError:
+        raise
+
+
+def new_event(event: Event):
+    try:
+        connection.db["events"].insert_one(event.model_dump())
     except PyMongoError:
         raise
